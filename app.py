@@ -20,5 +20,7 @@ def run():
         if got != API_SECRET:
             return jsonify({"error": "unauthorized"}), 401
 
+    
     result = run_pipeline()
     return jsonify(result), 200
+
