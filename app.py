@@ -1,8 +1,14 @@
 import os
-from flask import Flask, jsonify, request
-from pipeline import run_pipeline
+from flask import request
 
-app = Flask(__name__)
+@app.route("/run", methods=["POST"])
+def run():
+    try:
+        run_pipeline()
+        return "Pipeline triggered", 200
+    except Exception as e:
+        print("ERROR running pipeline:", str(e))
+        return f"Error: {str(e)}", 500
 
 # Simple shared secret (optional, but recommended)
 # Set this as an env var in Cloud Run and in Scheduler header/query
