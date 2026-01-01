@@ -10,6 +10,10 @@ def run():
         print("ERROR running pipeline:", str(e))
         return f"Error: {str(e)}", 500
 
+@app.route("/", methods=["GET"])
+def health():
+    return "OK", 200
+
 # Simple shared secret (optional, but recommended)
 # Set this as an env var in Cloud Run and in Scheduler header/query
 API_SECRET = os.environ.get("API_SECRET", "")
@@ -17,6 +21,7 @@ API_SECRET = os.environ.get("API_SECRET", "")
 @app.get("/")
 def health():
     return "ok", 200
+
 
 @app.post("/run")
 def run():
