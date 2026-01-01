@@ -45,7 +45,7 @@ from typing import List, Dict, Tuple, Optional
 from collections import defaultdict
 
 from google.cloud import storage
-from google.cloud import vision
+from google.cloud import vision_v1 as vision
 
 # =========================================================
 # CONFIG (GCS)
