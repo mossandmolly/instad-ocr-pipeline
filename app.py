@@ -1,26 +1,18 @@
 import os
-from flask import request
+from flask import Flask, request, jsonify
 
-@app.route("/run", methods=["POST"])
-def run():
-    try:
-        run_pipeline()
-        return "Pipeline triggered", 200
-    except Exception as e:
-        print("ERROR running pipeline:", str(e))
-        return f"Error: {str(e)}", 500
+from pipeline import run_pipeline  # adjust if your import path differs
 
-@app.route("/", methods=["GET"])
-def health():
-    return "OK", 200
+app = Flask(__name__)
 
-# Simple shared secret (optional, but recommended)
-# Set this as an env var in Cloud Run and in Scheduler header/query
+# Optional shared secret (recommended if you're calling from Scheduler)
+# Set this env var in Cloud Run, and send header X-API-SECRET from caller
 API_SECRET = os.environ.get("API_SECRET", "")
+
 
 @app.get("/")
 def health():
-    return "ok", 200
+    return "OK", 200
 
 
 @app.post("/run")
@@ -31,7 +23,15 @@ def run():
         if got != API_SECRET:
             return jsonify({"error": "unauthorized"}), 401
 
-    
-    result = run_pipeline()
-    return jsonify(result), 200
+    try:
+        result = run_pipeline()
+        # If your run_pipeline returns None or a string, normalize it
+        if result is None:
+            result = {"status": "triggered"}
+        elif isinstance(result, str):
+            result = {"status": result}
+        return jsonify(result), 200
 
+    except Exception as e:
+        print("ERROR running pipeline:", str(e))
+        return jsonify({"error": str(e)}), 500
